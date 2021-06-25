@@ -14,12 +14,14 @@ source:
 build:
   noarch: python
   number: 0
-  script: python -m pip install --no-deps --ignore-installed .
+  script: {{ PYTHON }} -m pip install . --no-deps -vv
 
 requirements:
   host:
     - python
     - pip
+    - setuptools
+    - wheel
   run:
     - python
 
@@ -32,13 +34,17 @@ test:
     - cgroupspy.nodes
     - cgroupspy.trees
     - cgroupspy.utils
+  requires:
+    - pip
+  commands:
+    - pip check
 
 about:
   home: https://github.com/cloudsigma/cgroupspy
   license: BSD-3-Clause
   license_family: BSD
   license_file: LICENSE
-  summary: 'Python library for managing cgroups'
+  summary: Python library for managing cgroups
 
   description: |
     Python library for managing cgroups
