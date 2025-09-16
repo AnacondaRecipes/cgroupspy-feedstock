@@ -1,6 +1,6 @@
 {% set name = "cgroupspy" %}
-{% set version = "0.2.2" %}
-{% set sha256 = "d42b4666b852e65e20b8864747fe86e27c04d3b09d44c76f18cca9b12c957475" %}
+{% set version = "0.2.3" %}
+{% set sha256 = "8ee941c7ab9234a0b17a81b0b26487f7f1031f78b7a24cdd8eed1b5fa5970496" %}
 
 package:
   name: {{ name|lower }}
@@ -8,12 +8,13 @@ package:
 
 source:
   fn: {{ name }}-{{ version }}.tar.gz
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
   sha256: {{ sha256 }}
 
 build:
   number: 0
   script: {{ PYTHON }} -m pip install . --no-deps -vv
+  skip: true  # [py==30,==31,==32,==33,==34,==35]
 
 requirements:
   host:
@@ -44,7 +45,6 @@ about:
   license_family: BSD
   license_file: LICENSE
   summary: Python library for managing cgroups
-
   description: |
     Python library for managing cgroups
 
