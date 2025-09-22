@@ -41,7 +41,8 @@ test:
     - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
     # test_interfaces -> ImportError: attempted relative import beyond top-level package
     # test_controllers -> ModuleNotFoundError: No module named 'mock'
-    - nosetests cgroupspy/test --exclude="test_interfaces|test_controllers"
+    # py<312 -> ModuleNotFoundError: No module named 'imp' - imp is deprecated in newer python
+    - nosetests cgroupspy/test --exclude="test_interfaces|test_controllers"  # [py<312]
 
 about:
   home: https://github.com/cloudsigma/cgroupspy
