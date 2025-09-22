@@ -1,31 +1,30 @@
 {% set name = "cgroupspy" %}
 {% set version = "0.2.3" %}
-{% set sha256 = "8ee941c7ab9234a0b17a81b0b26487f7f1031f78b7a24cdd8eed1b5fa5970496" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  fn: {{ name }}-{{ version }}.tar.gz
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: {{ sha256 }}
+  sha256: 8ee941c7ab9234a0b17a81b0b26487f7f1031f78b7a24cdd8eed1b5fa5970496
 
 build:
   number: 0
-  script: {{ PYTHON }} -m pip install . --no-deps -vv
-  skip: true  # [py==30,==31,==32,==33,==34,==35]
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  skip: True  # [py<36]
 
 requirements:
   host:
     - python
     - pip
     - setuptools
-    - wheel
   run:
     - python
 
 test:
+  source_files:
+    - cgroupspy/test
   imports:
     - cgroupspy
     - cgroupspy.contenttypes
@@ -36,8 +35,13 @@ test:
     - cgroupspy.utils
   requires:
     - pip
+    - nose
   commands:
     - pip check
+    - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
+    # test_interfaces -> ImportError: attempted relative import beyond top-level package
+    # test_controllers -> ModuleNotFoundError: No module named 'mock'
+    - nosetests cgroupspy/test --exclude="test_interfaces|test_controllers"
 
 about:
   home: https://github.com/cloudsigma/cgroupspy
@@ -52,6 +56,7 @@ about:
     It provides interfaces that convert python objects to cgroups
     compatible strings and vise versa.
   dev_url: https://github.com/cloudsigma/cgroupspy
+  doc_url: https://github.com/cloudsigma/cgroupspy/blob/master/README.md
 
 extra:
   recipe-maintainers:
