@@ -1,30 +1,30 @@
 {% set name = "cgroupspy" %}
-{% set version = "0.2.2" %}
-{% set sha256 = "d42b4666b852e65e20b8864747fe86e27c04d3b09d44c76f18cca9b12c957475" %}
+{% set version = "0.2.3" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  fn: {{ name }}-{{ version }}.tar.gz
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: {{ sha256 }}
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: 8ee941c7ab9234a0b17a81b0b26487f7f1031f78b7a24cdd8eed1b5fa5970496
 
 build:
   number: 0
-  script: {{ PYTHON }} -m pip install . --no-deps -vv
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  skip: True  # [py<36]
 
 requirements:
   host:
     - python
     - pip
     - setuptools
-    - wheel
   run:
     - python
 
 test:
+  source_files:
+    - cgroupspy/test
   imports:
     - cgroupspy
     - cgroupspy.contenttypes
@@ -35,8 +35,14 @@ test:
     - cgroupspy.utils
   requires:
     - pip
+    - nose
   commands:
     - pip check
+    - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
+    # test_interfaces -> ImportError: attempted relative import beyond top-level package
+    # test_controllers -> ModuleNotFoundError: No module named 'mock'
+    # py<312 -> ModuleNotFoundError: No module named 'imp' - imp is deprecated in newer python
+    - nosetests cgroupspy/test --exclude="test_interfaces|test_controllers"  # [py<312]
 
 about:
   home: https://github.com/cloudsigma/cgroupspy
@@ -44,7 +50,6 @@ about:
   license_family: BSD
   license_file: LICENSE
   summary: Python library for managing cgroups
-
   description: |
     Python library for managing cgroups
 
@@ -52,6 +57,7 @@ about:
     It provides interfaces that convert python objects to cgroups
     compatible strings and vise versa.
   dev_url: https://github.com/cloudsigma/cgroupspy
+  doc_url: https://github.com/cloudsigma/cgroupspy/blob/master/README.md
 
 extra:
   recipe-maintainers:
